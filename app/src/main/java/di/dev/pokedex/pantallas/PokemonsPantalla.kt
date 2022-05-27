@@ -2,6 +2,8 @@ package di.dev.pokedex.pantallas
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -15,10 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import di.dev.pokedex.data.Result
+import di.dev.pokedex.mvvm.PokemonViewModel
 import di.dev.pokedex.navegacion.NavegacionPantallas
 
 @Composable
 fun PokemonsPantalla(navController: NavController){
+    val pokemonViewModel: PokemonViewModel = PokemonViewModel()
+
     //Scaffold agrega botones de back, un espacio y el texto "Pokedex List"
     Scaffold(topBar = {
         TopAppBar {
@@ -31,12 +37,13 @@ fun PokemonsPantalla(navController: NavController){
             Text(text = "Pokedex List")
         }
     }) {
-        Pokemones()
+        Pokemones(pokemons = pokemonViewModel.listaPokemons)
+        pokemonViewModel.getPokemons()
     }
 }
 
 @Composable
-fun Pokemon(name: String){
+fun Pokemon(result: Result){
     val expanded = remember { mutableStateOf(false)}
     val extraPadding = if(expanded.value) 48.dp else 0.dp
     // Surface es el espacio o superficie en la que se van a organizar nuestros elementos gráficos. Parecido a un Layout
@@ -50,7 +57,7 @@ fun Pokemon(name: String){
                     .padding(bottom = extraPadding)
             ){
                 Text("Pokemon: ")
-                Text(text = name)
+                Text(text = result.name)
             }
             //OutLinedButton crea un botón con un borde suave.
             OutlinedButton(onClick = { expanded.value = !expanded.value}) {
@@ -61,21 +68,12 @@ fun Pokemon(name: String){
 }
 
 @Composable
-private fun Pokemones(cameos: List<String> = List(10){"$it"}){
+private fun Pokemones(pokemons: List<Result>){
     val scrollState = rememberScrollState()
 
-    Column(modifier = Modifier
-        .padding(vertical = 5.dp)
-        .verticalScroll(scrollState)) {
-        for(cameo in cameos) {
-            Pokemon(cameo)
+    LazyColumn{
+        itemsIndexed(items = pokemons){index, item ->
+            Pokemon(result = item)
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun ListaPreview() {
-
-}
-
