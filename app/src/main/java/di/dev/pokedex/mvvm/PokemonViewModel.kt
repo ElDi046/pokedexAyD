@@ -19,6 +19,10 @@ dentro de este irá la corrutina que será cancelada cuando el ViewModel se limp
 class PokemonViewModel : ViewModel() {
     var listaPokemons : List<Result> by mutableStateOf(listOf())
     var errorMessage : String by mutableStateOf("")
+    var isLoading = mutableStateOf(false)
+    var endReached = mutableStateOf(false)
+
+    private var curPage = 0
 
     fun getPokemons(){
         viewModelScope.launch {
